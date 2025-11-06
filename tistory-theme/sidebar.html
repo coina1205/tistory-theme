@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidebar Widgets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- Search Widget -->
+  <aside class="sidebar">
+    <h3 class="widget-title">Search</h3>
+    <form class="search-box" action="/search" method="get">
+      <input type="text" name="q" placeholder="Search articles..." aria-label="Search">
+      <button type="submit">Go</button>
+    </form>
+  </aside>
+
+  <!-- Popular Posts Widget -->
+  <aside class="sidebar">
+    <h3 class="widget-title">Popular Posts</h3>
+    <ol class="popular-posts">
+      <li>
+        <a href="/post/reentrancy-attack">Understanding Reentrancy Attacks in Smart Contracts</a>
+        <div class="post-date">2025-01-15</div>
+      </li>
+      <li>
+        <a href="/post/access-control">Access Control Patterns in Solidity</a>
+        <div class="post-date">2025-01-12</div>
+      </li>
+      <li>
+        <a href="/post/integer-overflow">Integer Overflow and Underflow Prevention</a>
+        <div class="post-date">2025-01-08</div>
+      </li>
+      <li>
+        <a href="/post/gas-optimization">Gas Optimization Techniques for Smart Contracts</a>
+        <div class="post-date">2025-01-05</div>
+      </li>
+      <li>
+        <a href="/post/proxy-patterns">Upgradeable Contract Patterns</a>
+        <div class="post-date">2025-01-02</div>
+      </li>
+    </ol>
+  </aside>
+
+  <!-- Tag Cloud Widget -->
+  <aside class="sidebar">
+    <h3 class="widget-title">Tags</h3>
+    <div class="tag-cloud">
+      <a href="/tag/solidity" class="size-4">#Solidity</a>
+      <a href="/tag/security" class="size-4">#Security</a>
+      <a href="/tag/audit" class="size-3">#Audit</a>
+      <a href="/tag/ethereum" class="size-3">#Ethereum</a>
+      <a href="/tag/defi" class="size-2">#DeFi</a>
+      <a href="/tag/nft" class="size-2">#NFT</a>
+      <a href="/tag/gas" class="size-2">#Gas</a>
+      <a href="/tag/optimization" class="size-2">#Optimization</a>
+      <a href="/tag/patterns" class="size-1">#Patterns</a>
+      <a href="/tag/testing" class="size-1">#Testing</a>
+      <a href="/tag/foundry" class="size-1">#Foundry</a>
+      <a href="/tag/hardhat" class="size-1">#Hardhat</a>
+    </div>
+  </aside>
+
+</div>
+
+</body>
+</html>

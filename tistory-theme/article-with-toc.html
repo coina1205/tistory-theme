@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Understanding Reentrancy Attacks - Bakaliee Security Blog</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="article-layout">
+    
+    <!-- Main Article -->
+    <article class="post">
+      <h1>Understanding Reentrancy Attacks in Smart Contracts</h1>
+      
+      <div class="post-meta">
+        <span class="date">2025-01-15</span>
+        <div class="tags">
+          <a href="/tag/solidity">#Solidity</a>
+          <a href="/tag/security">#Security</a>
+          <a href="/tag/audit">#Audit</a>
+        </div>
+      </div>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        Reentrancy attacks are one of the most devastating vulnerabilities in smart contract security. 
+        The infamous DAO hack in 2016, which resulted in the loss of $60 million worth of Ether, 
+        was caused by a reentrancy vulnerability. Understanding and preventing these attacks is 
+        crucial for any smart contract developer.
+      </p>
+
+      <div class="callout tip">
+        <div class="callout-title">💡 Key Takeaway</div>
+        <p>Always follow the Checks-Effects-Interactions pattern to prevent reentrancy attacks.</p>
+      </div>
+
+      <h2 id="what-is-reentrancy">What is Reentrancy?</h2>
+      <p>
+        A reentrancy attack occurs when a malicious contract calls back into the calling contract 
+        before the first invocation is complete. This allows the attacker to repeatedly execute 
+        certain functions and drain funds or manipulate state.
+      </p>
+
+      <h3 id="attack-flow">Attack Flow</h3>
+      <p>The typical reentrancy attack follows this pattern:</p>
+      <ol>
+        <li>Attacker calls a vulnerable function (e.g., <code>withdraw</code>)</li>
+        <li>Vulnerable contract sends Ether to attacker</li>
+        <li>Attacker's fallback function is triggered</li>
+        <li>Fallback function calls <code>withdraw</code> again</li>
+        <li>Process repeats until funds are drained</li>
+      </ol>
+
+      <h2 id="vulnerable-code">Vulnerable Code Example</h2>
+      <p>
+        Here's a classic example of a vulnerable contract that's susceptible to reentrancy attacks:
+      </p>
+
+      <blockquote>
+        <p>
+          <strong>Warning:</strong> The following code is intentionally vulnerable and should 
+          never be used in production. It's provided for educational purposes only.
+        </p>
+      </blockquote>
+
+      <h2 id="prevention">Prevention Techniques</h2>
+      
+      <h3 id="checks-effects-interactions">Checks-Effects-Interactions Pattern</h3>
+      <p>
+        The most fundamental defense against reentrancy is following the 
+        <strong>Checks-Effects-Interactions</strong> pattern:
+      </p>
+      <ul>
+        <li><strong>Checks:</strong> Validate all conditions and requirements</li>
+        <li><strong>Effects:</strong> Update contract state</li>
+        <li><strong>Interactions:</strong> Call external contracts</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Important</div>
+        <p>Always update state variables before making external calls to prevent reentrancy.</p>
+      </div>
+
+      <h3 id="reentrancy-guard">ReentrancyGuard</h3>
+      <p>
+        OpenZeppelin provides a <code>ReentrancyGuard</code> contract that implements a mutex 
+        to prevent reentrant calls. This is the recommended approach for most applications.
+      </p>
+
+      <h2 id="best-practices">Best Practices</h2>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Practice</th>
+            <th>Description</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Use ReentrancyGuard</td>
+            <td>Apply OpenZeppelin's modifier to sensitive functions</td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td>Checks-Effects-Interactions</td>
+            <td>Follow the pattern in all state-changing functions</td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td>Pull over Push</td>
+            <td>Let users withdraw funds instead of pushing to them</td>
+            <td>Medium</td>
+          </tr>
+          <tr>
+            <td>Gas Limits</td>
+            <td>Be aware of gas limits when calling external contracts</td>
+            <td>Medium</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout danger">
+        <div class="callout-title">🚨 Critical</div>
+        <p>
+          Never assume external calls will behave as expected. Always implement proper guards 
+          and follow security best practices.
+        </p>
+      </div>
+
+      <h2 id="conclusion">Conclusion</h2>
+      <p>
+        Reentrancy attacks remain a significant threat to smart contract security. By understanding 
+        the attack vector and implementing proper defenses like the Checks-Effects-Interactions 
+        pattern and ReentrancyGuard, you can protect your contracts from this vulnerability.
+      </p>
+
+      <figure>
+        <img src="/placeholder.svg?height=400&width=800" alt="Smart Contract Security Diagram">
+        <figcaption>Figure 1: Reentrancy attack flow visualization</figcaption>
+      </figure>
+
+      <p>
+        For more information on smart contract security, check out the 
+        <a href="https://consensys.github.io/smart-contract-best-practices/">ConsenSys Smart Contract Best Practices</a> 
+        and the <a href="https://swcregistry.io/">Smart Contract Weakness Classification Registry</a>.
+      </p>
+
+      <div class="tag-list">
+        <a href="/tag/solidity">#Solidity</a>
+        <a href="/tag/security">#Security</a>
+        <a href="/tag/audit">#Audit</a>
+        <a href="/tag/reentrancy">#Reentrancy</a>
+        <a href="/tag/ethereum">#Ethereum</a>
+      </div>
+    </article>
+
+    <!-- Table of Contents -->
+    <aside class="toc">
+      <div class="toc-title">Table of Contents</div>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li>
+          <a href="#what-is-reentrancy">What is Reentrancy?</a>
+          <ul>
+            <li><a href="#attack-flow">Attack Flow</a></li>
+          </ul>
+        </li>
+        <li><a href="#vulnerable-code">Vulnerable Code Example</a></li>
+        <li>
+          <a href="#prevention">Prevention Techniques</a>
+          <ul>
+            <li><a href="#checks-effects-interactions">Checks-Effects-Interactions Pattern</a></li>
+            <li><a href="#reentrancy-guard">ReentrancyGuard</a></li>
+          </ul>
+        </li>
+        <li><a href="#best-practices">Best Practices</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </aside>
+
+  </div>
+</div>
+
+</body>
+</html>
