@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakaliee's Smart Contract Security Diary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Dracula Pastel Color Palette */
+            --bg-primary: #282a36;
+            --bg-secondary: #1e1f29;
+            --bg-card: #2d2f3d;
+            --text-primary: #f8f8f2;
+            --text-secondary: #a0a0ab;
+            --accent-pink: #ff9ac1;
+            --accent-purple: #bd93f9;
+            --accent-cyan: #8be9fd;
+            --accent-green: #a8e6cf;
+            --accent-yellow: #f1fa8c;
+            --border-color: #44475a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-secondary);
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .write-btn {
+            color: var(--accent-yellow);
+            border: 1px solid var(--border-color);
+            padding: 0.35rem 0.9rem;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .write-btn:hover {
+            color: var(--bg-primary);
+            background: var(--accent-yellow);
+            border-color: var(--accent-yellow);
+        }
+
+        .fab-write {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            color: var(--bg-primary);
+            font-size: 28px;
+            font-weight: 900;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 12px 30px rgba(189, 147, 249, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 9999;
+            text-decoration: none;
+        }
+
+        .fab-write:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(189, 147, 249, 0.35);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-purple);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 3rem 0;
+        }
+
+        /* Changed category-tag from div to anchor for Tistory category links */
+        .category-tag {
+            padding: 0.5rem 1.5rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .category-tag:hover {
+            border-color: var(--accent-cyan);
+            background-color: rgba(139, 233, 253, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        /* Blog Grid */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .blog-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-purple);
+            box-shadow: 0 10px 30px rgba(189, 147, 249, 0.2);
+        }
+
+        .blog-tag {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background-color: rgba(189, 147, 249, 0.2);
+            color: var(--accent-purple);
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .blog-tag a {
+            color: var(--accent-purple);
+            text-decoration: none;
+        }
+
+        .blog-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .blog-card h3 a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .blog-card h3 a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .blog-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .read-more {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: var(--accent-pink);
+        }
+
+        /* Featured Section */
+        .featured {
+            background-color: var(--bg-secondary);
+            padding: 3rem 0;
+            margin: 4rem 0;
+            border-radius: 12px;
+        }
+
+        .featured-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .featured h2 {
+            font-size: 2.5rem;
+            color: var(--accent-pink);
+            margin-bottom: 1rem;
+        }
+
+        .featured-list {
+            list-style: none;
+        }
+
+        .featured-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .featured-list li:before {
+            content: "▹ ";
+            color: var(--accent-green);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-secondary);
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 2px solid var(--border-color);
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-purple);
+        }
+
+        /* Sidebar Table of Contents */
+        .content-wrapper {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 2rem;
+            width: 300px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 1.3rem;
+            color: var(--accent-purple);
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-section-title {
+            font-weight: 600;
+            color: var(--accent-pink);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .toc-subsection {
+            list-style: none;
+            margin-left: 0.5rem;
+        }
+
+        .toc-item {
+            padding: 0.5rem 0;
+            border-left: 2px solid transparent;
+            padding-left: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .toc-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .toc-item:hover {
+            border-left-color: var(--accent-cyan);
+        }
+
+        .toc-item:hover a {
+            color: var(--accent-cyan);
+        }
+
+        .toc-item.active {
+            border-left-color: var(--accent-purple);
+        }
+
+        .toc-item.active a {
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Section Headers */
+        .section-header {
+            margin: 4rem 0 2rem 0;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            scroll-margin-top: 2rem;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            color: var(--accent-pink);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+        }
+
+        .list-desc {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Added styles for Tistory list wrapper visibility control */
+        .s-list-wrapper {
+            display: none;
+        }
+
+        /* Show list wrapper on category/tag/search pages */
+        .tt-body-category .s-list-wrapper,
+        .tt-body-tag .s-list-wrapper,
+        .tt-body-search .s-list-wrapper {
+            display: block;
+        }
+
+        /* Hide all home page elements on category/tag/search pages for clean layout */
+        .tt-body-category .hero,
+        .tt-body-category .categories,
+        .tt-body-category .landing-wrapper,
+        .tt-body-category .featured,
+        .tt-body-category .fab-write,
+        .tt-body-tag .hero,
+        .tt-body-tag .categories,
+        .tt-body-tag .landing-wrapper,
+        .tt-body-tag .featured,
+        .tt-body-tag .fab-write,
+        .tt-body-search .hero,
+        .tt-body-search .categories,
+        .tt-body-search .landing-wrapper,
+        .tt-body-search .featured,
+        .tt-body-search .fab-write {
+            display: none;
+        }
+
+        /* Adjust content wrapper for category pages - remove sidebar gap */
+        .tt-body-category .content-wrapper,
+        .tt-body-tag .content-wrapper,
+        .tt-body-search .content-wrapper {
+            margin-top: 2rem;
+        }
+
+        /* Style the category page header for clean presentation */
+        .tt-body-category .section-header,
+        .tt-body-tag .section-header,
+        .tt-body-search .section-header {
+            background: linear-gradient(135deg, rgba(189, 147, 249, 0.1), rgba(255, 154, 193, 0.1));
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .tt-body-category .section-header h2,
+        .tt-body-tag .section-header h2,
+        .tt-body-search .section-header h2 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Hide default Tistory category icons that cause layout issues */
+        .tistory-category img,
+        .tistory-category .ico_arrbt {
+            display: none !important;
+        }
+
+        /* Style for category count */
+        .tistory-category .cnt {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-left: 0.3rem;
+        }
+
+        /* Active/selected category styling */
+        .tistory-category .selected > a,
+        .tistory-category .selected > .link_tit {
+            color: var(--accent-purple);
+            font-weight: 600;
+            background-color: rgba(189, 147, 249, 0.1);
+        }
+
+        /* Added styles for permalink article sections */
+        .crumb {
+            padding: 1rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .crumb a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .crumb a:hover {
+            color: var(--accent-pink);
+        }
+
+        .crumb .now {
+            color: var(--text-primary);
+        }
+
+        .related-wrap {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .related-title {
+            font-size: 1.5rem;
+            color: var(--accent-purple);
+            margin-bottom: 1.5rem;
+        }
+
+        .related-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .related-list li {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .related-list li:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-cyan);
+        }
+
+        .related-list a {
+            display: block;
+            padding: 1rem;
+            text-decoration: none;
+        }
+
+        .related-list img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 0.8rem;
+        }
+
+        .rl-title {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .rl-date {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .related-more {
+            display: inline-block;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .related-more:hover {
+            color: var(--accent-pink);
+        }
+
+        .post-nav {
+            display: flex;
+            gap: 1rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+        }
+
+        .post-nav a {
+            flex: 1;
+            min-width: 250px;
+            padding: 1.5rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .post-nav a:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-3px);
+        }
+
+        .post-nav .prev::before {
+            content: "← ";
+            color: var(--accent-cyan);
+        }
+
+        .post-nav .next::after {
+            content: " →";
+            color: var(--accent-cyan);
+        }
+
+        .comments {
+            margin: 3rem 0;
+            padding: 2rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        /* Force show post buttons */
+        .container_postbtn {
+            display: block !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: static;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-content {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">🔐 Bakaliee's Diary</div>
+                <nav>
+                    <ul>
+                        <li><a href="/">홈</a></li>
+                        <li><a href="/category">아티클</a></li>
+                        <li><a href="/tag">튜토리얼</a></li>
+                        <li><a href="/guestbook">소개</a></li>
+                        <li><a class="write-btn" href="/manage/newpost/?type=post" target="_blank" rel="noopener">Write</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Bakaliee's Smart Contract Security Diary</h1>
+                <p>스마트 컨트랙트 보안 감사와 취약점 분석, CTF 워게임부터 버그 바운티까지의 여정을 기록합니다.</p>
+            </div>
+        </section>
+
+        <section class="container">
+            <!-- Changed category buttons to hashtag style -->
+            <div class="categories">
+                <span class="category-tag">#Blockchain</span>
+                <span class="category-tag">#Web3</span>
+                <span class="category-tag">#DeFi</span>
+                <span class="category-tag">#Audit</span>
+                <span class="category-tag">#BugBounty</span>
+                <span class="category-tag">#SmartContract</span>
+                <span class="category-tag">#Security</span>
+            </div>
+
+            <div class="content-wrapper">
+                <aside class="sidebar">
+                    <!-- Changed sidebar title to English -->
+                    <h2>📚 Categories</h2>
+                    <!-- Replaced Tistory category tree with manual TOC for scroll navigation -->
+                    <ul class="toc-list">
+                        <li class="toc-section">
+                            <div class="toc-section-title">1. Foundations</div>
+                            <ul class="toc-subsection">
+                                <li class="toc-item"><a href="#section-1-1">1.1 Blockchain & Ethereum Basics</a></li>
+                                <li class="toc-item"><a href="#section-1-2">1.2 Solidity 기초</a></li>
+                                <li class="toc-item"><a href="#section-1-3">1.3 Dev Tools: Hardhat / Foundry / Remix</a></li>
+                                <li class="toc-item"><a href="#section-1-4">1.4 취약점 유형 학습 (SWC, Reentrancy, Integer Issues)</a></li>
+                                <li class="toc-item"><a href="#section-1-5">1.5 감사 리포트 읽는 법 (Case Study)</a></li>
+                            </ul>
+                        </li>
+                        <li class="toc-section">
+                            <div class="toc-section-title">2. Practicals — CTF & 워게임</div>
+                            <ul class="toc-subsection">
+                                <li class="toc-item"><a href="#section-2-1">2.1 Ethernaut Write-ups</a></li>
+                                <li class="toc-item"><a href="#section-2-2">2.2 Capture the Ether</a></li>
+                                <li class="toc-item"><a href="#section-2-3">2.3 Damn Vulnerable DeFi</a></li>
+                            </ul>
+                        </li>
+                        <li class="toc-section">
+                            <div class="toc-section-title">3. Bug Bounty & Contest</div>
+                            <ul class="toc-subsection">
+                                <li class="toc-item"><a href="#section-3">3. Bug Bounty & Contest 시작하기</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </aside>
+
+                <div class="main-content">
+                    <!-- Added Tistory list block for category/tag/search pages -->
+                    <div class="s-list-wrapper">
+                        <s_list>
+                            <div class="section-header">
+                                <h2>[##_list_conform_##]</h2>
+                                <p class="list-desc">[##_list_description_##]</p>
+                            </div>
+
+                            <div class="blog-grid">
+                                <s_list_rep>
+                                    <article class="blog-card">
+                                        <span class="blog-tag">
+                                            <a href="[##_list_rep_category_link_##]">[##_list_rep_category_##]</a>
+                                        </span>
+                                        <h3>
+                                            <a href="[##_list_rep_link_##]">[##_list_rep_title_##]</a>
+                                        </h3>
+                                        <p>[##_list_rep_summary_##]</p>
+                                        <div class="blog-meta">
+                                            <span>[##_list_rep_regdate_##]</span>
+                                            <a class="read-more" href="[##_list_rep_link_##]">더 읽기 →</a>
+                                        </div>
+                                    </article>
+                                </s_list_rep>
+
+                                <s_list_empty>
+                                    <p style="color: var(--text-secondary); text-align: center; padding: 3rem;">아직 이 목록에 글이 없습니다.</p>
+                                </s_list_empty>
+                            </div>
+                        </s_list>
+                    </div>
+
+                    <!-- Replaced static landing cards with dynamic Tistory index article cards -->
+                    <div class="landing-wrapper">
+                        <div class="section-header" id="foundations">
+                            <h2>1. Foundations</h2>
+                            <p>스마트 컨트랙트 보안의 기초를 다지는 필수 학습 과정</p>
+                        </div>
+
+                        <div class="blog-grid">
+                            <article class="blog-card" id="section-1-1">
+                                <span class="blog-tag">Foundations</span>
+                                <h3><a href="#">1.1 Blockchain & Ethereum Basics</a></h3>
+                                <p>블록체인의 기본 개념부터 이더리움의 작동 원리까지, 스마트 컨트랙트 보안을 이해하기 위한 필수 기초 지식을 다룹니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 20일</span>
+                                    <a href="/category/Foundations" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+
+                            <article class="blog-card" id="section-1-2">
+                                <span class="blog-tag">Foundations</span>
+                                <h3><a href="#">1.2 Solidity 기초</a></h3>
+                                <p>스마트 컨트랙트 개발 언어인 Solidity의 문법과 핵심 개념을 학습하고, 보안을 고려한 코딩 패턴을 익힙니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 18일</span>
+                                    <a href="/category/Foundations" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+
+                            <article class="blog-card" id="section-1-3">
+                                <span class="blog-tag">Foundations</span>
+                                <h3><a href="#">1.3 Dev Tools: Hardhat / Foundry / Remix</a></h3>
+                                <p>스마트 컨트랙트 개발과 테스팅을 위한 필수 도구들을 비교하고, 각 도구의 장단점과 활용법을 소개합니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 15일</span>
+                                    <a href="/category/Foundations" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+
+                            <article class="blog-card" id="section-1-4">
+                                <span class="blog-tag">Foundations</span>
+                                <h3><a href="#">1.4 취약점 유형 학습 (SWC, Reentrancy, Integer Issues)</a></h3>
+                                <p>SWC Registry를 기반으로 한 주요 스마트 컨트랙트 취약점들을 분석하고, 실제 공격 사례와 방어 기법을 학습합니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 12일</span>
+                                    <a href="/category/Foundations" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+
+                            <article class="blog-card" id="section-1-5">
+                                <span class="blog-tag">Foundations</span>
+                                <h3><a href="#">1.5 감사 리포트 읽는 법 (Case Study)</a></h3>
+                                <p>실제 보안 감사 리포트를 분석하며 취약점 발견 과정과 보고서 작성 방법을 배우고, 전문가의 시각을 익힙니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 10일</span>
+                                    <a href="/category/Foundations" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="section-header" id="ctf-wargames">
+                            <h2>2. Practicals — CTF & 워게임</h2>
+                            <p>실전 해킹 기법을 익히는 워게임 챌린지</p>
+                        </div>
+
+                        <div class="blog-grid">
+                            <article class="blog-card" id="section-2-1">
+                                <span class="blog-tag">CTF & 워게임</span>
+                                <h3><a href="#">2.1 Ethernaut Write-ups</a></h3>
+                                <p>OpenZeppelin의 Ethernaut 챌린지 풀이를 통해 실전 스마트 컨트랙트 해킹 기법과 보안 취약점을 실습합니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 8일</span>
+                                    <a href="/category/CTF%20%26%20%EC%9B%8C%EA%B2%8C%EC%9E%84" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+
+                            <article class="blog-card" id="section-2-2">
+                                <span class="blog-tag">CTF & 워게임</span>
+                                <h3><a href="#">2.2 Capture the Ether</a></h3>
+                                <p>이더리움 보안 워게임인 Capture the Ether의 다양한 챌린지를 풀어보며 실전 취약점 공격 기술을 습득합니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 5일</span>
+                                    <a href="/category/CTF%20%26%20%EC%9B%8C%EA%B2%8C%EC%9E%84" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+
+                            <article class="blog-card" id="section-2-3">
+                                <span class="blog-tag">CTF & 워게임</span>
+                                <h3><a href="#">2.3 Damn Vulnerable DeFi</a></h3>
+                                <p>DeFi 프로토콜의 실제 취약점을 재현한 워게임을 통해 플래시론, 가격 조작 등 고급 공격 기법을 학습합니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 3일</span>
+                                    <a href="/category/CTF%20%26%20%EC%9B%8C%EA%B2%8C%EC%9E%84" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="section-header" id="bug-bounty">
+                            <h2>3. Bug Bounty & Contest</h2>
+                            <p>실전 버그 바운티와 보안 컨테스트 참여 가이드</p>
+                        </div>
+
+                        <div class="blog-grid">
+                            <article class="blog-card" id="section-3">
+                                <span class="blog-tag">Bug Bounty</span>
+                                <h3><a href="#">3. Bug Bounty & Contest 시작하기</a></h3>
+                                <p>Immunefi, Code4rena, Sherlock 등 주요 버그 바운티 플랫폼 소개와 실전 참여 전략, 리포트 작성 팁을 공유합니다.</p>
+                                <div class="blog-meta">
+                                    <span>2025년 1월 1일</span>
+                                    <a href="/category/Bug%20Bounty" class="read-more">더 읽기 →</a>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="color: var(--text-secondary);">© 2025 Bakaliee's Smart Contract Security Diary. 모든 권리 보유.</p>
+            <div class="social-links">
+                <a href="#">GitHub</a>
+                <a href="#">Twitter</a>
+                <a href="#">Discord</a>
+                <a href="#">Medium</a>
+            </div>
+        </div>
+    </footer>
+
+    <a class="fab-write" href="/manage/newpost/?type=post" target="_blank" rel="noopener" title="새 글 쓰기">＋</a>
+
+    <div id="hidden-cat" style="display:none">[##_category_##]</div>
+
+    <script>
+        const catMap = new Map();
+        document.querySelectorAll('#hidden-cat a.link_tit, #hidden-cat a').forEach(a => {
+            const name = a.textContent.trim();
+            const href = a.getAttribute('href');
+            if (name && href) catMap.set(name, href);
+        });
+
+        // Fix "더 읽기" buttons in landing cards to use correct category links
+        document.querySelectorAll('.landing-wrapper .blog-card').forEach(card => {
+            const tag = card.querySelector('.blog-tag');
+            const more = card.querySelector('.read-more');
+            if (tag && more) {
+                const name = tag.textContent.trim();
+                const fixed = catMap.get(name);
+                if (fixed) more.href = fixed;
+            }
+        });
+
+        // Smooth scroll for TOC links
+        document.querySelectorAll('.toc-item a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Highlight active section in TOC
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -70% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    document.querySelectorAll('.toc-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    const activeLink = document.querySelector(`.toc-item a[href="#${id}"]`);
+                    if (activeLink) {
+                        activeLink.parentElement.classList.add('active');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section-header[id]').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
